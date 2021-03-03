@@ -5,61 +5,108 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
+
 public class HandPresence : MonoBehaviour
 {
     public InputDeviceCharacteristics controllerCharacteristics;
     public List<GameObject> controllerPrefabs;
     private InputDevice targetDevice;
-    private GameObject spawnedController;  
+    private GameObject spawnedController;
 
+    GameObject prefab;
+
+    [SerializeField] GameObject IndexController;
+    [SerializeField] GameObject HTCViveWand;
+    
 
 
     void Start()
     {
-        List<InputDevice> devices = new List<InputDevice>();
-        InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
-       
-        foreach (var item in devices)
+
+
+
+        StartCoroutine(InitializeDevices());
+
+
+        IEnumerator InitializeDevices()
         {
-
-            print("name: " + item.name + "characteristics: " + item.characteristics);
-
-        }
-
-
-        if (devices.Count > 0)
-        {
-            targetDevice = devices[0];
-            GameObject prefab = controllerPrefabs.Find(controller => controller.name == targetDevice.name);
+            WaitForEndOfFrame wait = new WaitForEndOfFrame();
+            List<InputDevice> devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
             
-            if (prefab)
+            while (devices.Count < 1)
             {
-                spawnedController = Instantiate(prefab, transform);
+                yield return wait;
+                InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
+                
+            }
+            
+
+
+            foreach (var device in devices)
+            {
+
+                print("name: " + device.name + "characteristics: " + device.characteristics);
 
             }
-            else 
-            {
-                print("did not find controller model");
+
             
+
+
+
+            if (devices.Count > 0)
+            {
+                targetDevice = devices[0];
+
+                print("targetDevice is: " + targetDevice.name);
+               
+                if (targetDevice.name != "Index Controller OpenXR" && targetDevice.name != "HTC Vive Controller OpenXR")
+                {
+                    prefab = controllerPrefabs.Find(controller => controller.name == targetDevice.name);
+                }
+                else if (targetDevice.name == "Index Controller OpenXR")
+                {
+                    prefab = IndexController;
+                }           
+                
+                else if (targetDevice.name == "HTC Vive Controller OpenXR")
+                {
+                    prefab = HTCViveWand; 
+                }
+                
+               
+
+                if (prefab)
+                {
+                    spawnedController = Instantiate(prefab, transform);
+                    print("prefab is: " + prefab);
+                }
+                else
+                {
+                    print("did not find controller model");
+
+                }
             }
+
+
+
+
+
+
+
         }
 
 
 
         
-
-        
-
     }
-
-   
 
     void Update()
     {
         //the second parameter can be a bool for button, float for trigger, a vector2 for 2-axis thumbstick
         //TrygetFeaturevalue returns a boolean so we can put it in an if statement in case controller does not have this value
-        
-        
+
+
         //if (targetDevice.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryButtonValue)  &&  primaryButtonValue)
         //{
         //    print("pressing primary button on left controller");
