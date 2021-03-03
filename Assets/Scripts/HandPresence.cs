@@ -8,10 +8,15 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class HandPresence : MonoBehaviour
 {
+    public bool showController;
+
     public InputDeviceCharacteristics controllerCharacteristics;
     public List<GameObject> controllerPrefabs;
     private InputDevice targetDevice;
+    public GameObject handModelPrefab;
+
     private GameObject spawnedController;
+    private GameObject spawnedHandModel;
 
     GameObject prefab;
 
@@ -86,6 +91,9 @@ public class HandPresence : MonoBehaviour
                     print("did not find controller model");
 
                 }
+
+
+                spawnedHandModel = Instantiate(handModelPrefab, transform);
             }
 
 
@@ -103,6 +111,18 @@ public class HandPresence : MonoBehaviour
 
     void Update()
     {
+       
+        if(showController)
+        {            
+            spawnedController.SetActive(true);
+            spawnedHandModel.SetActive(false);
+        }
+        else
+        {
+            spawnedHandModel.SetActive(true);
+            spawnedController.SetActive(false);
+        }
+        
         //the second parameter can be a bool for button, float for trigger, a vector2 for 2-axis thumbstick
         //TrygetFeaturevalue returns a boolean so we can put it in an if statement in case controller does not have this value
 
