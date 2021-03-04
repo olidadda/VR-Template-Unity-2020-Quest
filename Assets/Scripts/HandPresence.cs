@@ -18,6 +18,8 @@ public class HandPresence : MonoBehaviour
     private GameObject spawnedController;
     private GameObject spawnedHandModel;
 
+    Animator handAnimator;
+
     GameObject prefab;
 
     [SerializeField] GameObject IndexController;
@@ -94,25 +96,43 @@ public class HandPresence : MonoBehaviour
 
 
                 spawnedHandModel = Instantiate(handModelPrefab, transform);
+                handAnimator = spawnedHandModel.GetComponent<Animator>();
             }
+        }        
+    }
 
+    void UpdateHandAnimation()
+    {
+        if (targetDevice.TryGetFeatureValue (CommonUsages.trigger, out float triggerValue))
+        {
+            handAnimator.SetFloat("Trigger", triggerValue);
+        }
+        else
+        {
+            handAnimator.SetFloat("Trigger", 0);
+        }
 
-
-
-
-
-
+        if (targetDevice.TryGetFeatureValue(CommonUsages.grip, out float gripValue))
+        {
+            handAnimator.SetFloat("Grip", gripValue);
+        }
+        else
+        {
+            handAnimator.SetFloat("Grip", 0);
         }
 
 
 
-        
+
+
     }
 
     void Update()
     {
-       
-        if(showController)
+
+        UpdateHandAnimation();
+
+        if (showController)
         {            
             spawnedController.SetActive(true);
             spawnedHandModel.SetActive(false);
@@ -144,4 +164,6 @@ public class HandPresence : MonoBehaviour
         //    print("thumbstick value is: " + thumbstickValue);
         //}
     }
+
+
 }
