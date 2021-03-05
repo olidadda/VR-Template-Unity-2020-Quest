@@ -14,6 +14,7 @@ public class HandPresence : MonoBehaviour
     public List<GameObject> controllerPrefabs;
     private InputDevice targetDevice;
     public GameObject handModelPrefab;
+   
 
     private GameObject spawnedController;
     private GameObject spawnedHandModel;
@@ -24,102 +25,157 @@ public class HandPresence : MonoBehaviour
 
     [SerializeField] GameObject IndexController;
     [SerializeField] GameObject HTCViveWand;
+
+    //-------------------------------------------
+
+
     
 
 
     void Start()
     {
 
+        TryInitialize();
+
+        //StartCoroutine(InitializeDevices());
 
 
-        StartCoroutine(InitializeDevices());
-
-
-        IEnumerator InitializeDevices()
-        {
-            WaitForEndOfFrame wait = new WaitForEndOfFrame();
-            List<InputDevice> devices = new List<InputDevice>();
-            InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
+        //IEnumerator InitializeDevices()
+        //{
+        //    WaitForEndOfFrame wait = new WaitForEndOfFrame();
+        //    List<InputDevice> devices = new List<InputDevice>();
+        //    InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
             
-            while (devices.Count < 1)
-            {
-                yield return wait;
-                InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
+        //    while (devices.Count < 1)
+        //    {
+        //        yield return wait;
+        //        InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
                 
-            }
+        //    }
             
 
 
-            foreach (var device in devices)
-            {
+        //    foreach (var device in devices)
+        //    {
 
-                print("name: " + device.name + "characteristics: " + device.characteristics);
+        //        print("name: " + device.name + "characteristics: " + device.characteristics);
 
-            }
+        //    }
 
             
 
 
 
-            if (devices.Count > 0)
-            {
-                targetDevice = devices[0];
+        //    if (devices.Count > 0)
+        //    {
+        //        targetDevice = devices[0];
 
-                print("targetDevice is: " + targetDevice.name);
+        //        print("targetDevice is: " + targetDevice.name);
                
-                if (targetDevice.name != "Index Controller OpenXR" && targetDevice.name != "HTC Vive Controller OpenXR")
-                {
-                    prefab = controllerPrefabs.Find(controller => controller.name == targetDevice.name);
-                }
-                else if (targetDevice.name == "Index Controller OpenXR")
-                {
-                    prefab = IndexController;
-                }           
+        //        if (targetDevice.name != "Index Controller OpenXR" && targetDevice.name != "HTC Vive Controller OpenXR")
+        //        {
+        //            prefab = controllerPrefabs.Find(controller => controller.name == targetDevice.name);
+        //        }
+        //        else if (targetDevice.name == "Index Controller OpenXR")
+        //        {
+        //            prefab = IndexController;
+        //        }           
                 
-                else if (targetDevice.name == "HTC Vive Controller OpenXR")
-                {
-                    prefab = HTCViveWand; 
-                }
+        //        else if (targetDevice.name == "HTC Vive Controller OpenXR")
+        //        {
+        //            prefab = HTCViveWand; 
+        //        }
                 
                
 
-                if (prefab)
-                {
-                    spawnedController = Instantiate(prefab, transform);
-                    print("prefab is: " + prefab);
-                }
-                else
-                {
-                    print("did not find controller model");
+        //        if (prefab)
+        //        {
+        //            spawnedController = Instantiate(prefab, transform);
+        //            print("prefab is: " + prefab);
+        //        }
+        //        else
+        //        {
+        //            print("did not find controller model");
 
-                }
+        //        }
 
 
-                spawnedHandModel = Instantiate(handModelPrefab, transform);
-                handAnimator = spawnedHandModel.GetComponent<Animator>();
-            }
-        }        
+        //        spawnedHandModel = Instantiate(/*handModelPrefab*/ andrewsHandPrefab, transform);
+        //        handAnimator = spawnedHandModel.GetComponent<Animator>();
+        //    }
+        //}        
     }
 
-    void UpdateHandAnimation()
+    private void TryInitialize()
     {
-        if (targetDevice.TryGetFeatureValue (CommonUsages.trigger, out float triggerValue))
+        List<InputDevice> devices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(controllerCharacteristics, devices);
+
+
+        foreach (var device in devices)
         {
-            handAnimator.SetFloat("Trigger", triggerValue);
-        }
-        else
-        {
-            handAnimator.SetFloat("Trigger", 0);
+            print("name: " + device.name + "characteristics: " + device.characteristics);
         }
 
-        if (targetDevice.TryGetFeatureValue(CommonUsages.grip, out float gripValue))
+
+        if (devices.Count > 0)
         {
-            handAnimator.SetFloat("Grip", gripValue);
+            targetDevice = devices[0];
+
+            print("targetDevice is: " + targetDevice.name);
+
+            if (targetDevice.name != "Index Controller OpenXR" && targetDevice.name != "HTC Vive Controller OpenXR")
+            {
+                prefab = controllerPrefabs.Find(controller => controller.name == targetDevice.name);
+            }
+            else if (targetDevice.name == "Index Controller OpenXR")
+            {
+                prefab = IndexController;
+            }
+
+            else if (targetDevice.name == "HTC Vive Controller OpenXR")
+            {
+                prefab = HTCViveWand;
+            }
+
+
+
+            if (prefab)
+            {
+                spawnedController = Instantiate(prefab, transform);
+                print("prefab is: " + prefab);
+            }
+            else
+            {
+                print("did not find controller model");
+
+            }
+
+
+            //spawnedHandModel = Instantiate(handModelPrefab , transform);
+           
+            //handAnimator = spawnedHandModel.GetComponent<Animator>();
         }
-        else
-        {
-            handAnimator.SetFloat("Grip", 0);
-        }
+    }
+    void UpdateHandAnimation()
+    {
+        //if (targetDevice.TryGetFeatureValue (CommonUsages.trigger, out float triggerValue))
+        //{
+        //    handAnimator.SetFloat("Trigger", triggerValue);
+        //}
+        //else
+        //{
+        //    handAnimator.SetFloat("Trigger", 0);
+        //}
+
+        //if (targetDevice.TryGetFeatureValue(CommonUsages.grip, out float gripValue))
+        //{
+        //    handAnimator.SetFloat("Grip", gripValue);
+        //}
+        //else
+        //{
+        //    handAnimator.SetFloat("Grip", 0);
+        //}
 
 
 
@@ -132,17 +188,23 @@ public class HandPresence : MonoBehaviour
 
         UpdateHandAnimation();
 
-        if (showController)
-        {            
-            spawnedController.SetActive(true);
-            spawnedHandModel.SetActive(false);
+        if (!targetDevice.isValid)
+        {
+            TryInitialize();
         }
         else
         {
-            spawnedHandModel.SetActive(true);
-            spawnedController.SetActive(false);
+            if (showController)
+            {
+                if (spawnedController != null) spawnedController.SetActive(true);
+                //if (spawnedHandModel != null) spawnedHandModel.SetActive(false);
+            }
+            else
+            {
+                //if (spawnedHandModel != null) spawnedHandModel.SetActive(true);
+                if (spawnedController != null) spawnedController.SetActive(false);
+            }
         }
-        
         //the second parameter can be a bool for button, float for trigger, a vector2 for 2-axis thumbstick
         //TrygetFeaturevalue returns a boolean so we can put it in an if statement in case controller does not have this value
 
